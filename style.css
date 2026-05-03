@@ -1,0 +1,121 @@
+body{
+    font-family: Arial;
+    background:#eee;
+}
+
+.form{
+    max-width:800px;
+    margin:auto;
+    background:white;
+    padding:15px;
+    border:2px solid black;
+}
+
+/* HEADER */
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.logo, .photo-box{
+    width:80px;
+    height:80px;
+    border:2px solid black;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.title{
+    text-align:center;
+}
+
+.title h1{
+    color:red;
+}
+
+/* COURSES */
+.courses{
+    background:green;
+    color:white;
+    padding:10px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+/* DETAILS */
+.row{
+    display:flex;
+    gap:10px;
+    margin:5px 0;
+}
+
+.row input, .row select{
+    flex:1;
+    border:none;
+    border-bottom:1px dotted black;
+}
+
+/* SECTION */
+.section{
+    background:orange;
+    text-align:center;
+}
+
+.red{
+    background:red;
+    color:white;
+}
+
+/* TABLE */
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th, td{
+    border:1px solid black;
+}
+
+td input{
+    width:100%;
+    border:none;
+}
+
+/* DOCS */
+.docs{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+}
+
+/* BUTTON */
+button{
+    width:100%;
+    padding:10px;
+    background:green;
+    color:white;
+}
+
+/* MOBILE */
+@media(max-width:600px){
+    .row{
+        flex-direction:column;
+    }
+}
+button{
+    padding:8px 15px;
+    background:#2c3e50;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+#fileName{
+    display:block;
+    margin-top:5px;
+    font-size:12px;
+    color:#555;
+}

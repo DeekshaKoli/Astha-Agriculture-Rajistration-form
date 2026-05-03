@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registration Form</title>
+
+<style>
+body{
+    font-family: Arial;
+    background:#eee;
+}
+
+.form{
+    max-width:800px;
+    margin:auto;
+    background:white;
+    padding:15px;
+    border:2px solid black;
+}
+
+/* HEADER */
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+}
+
+.logo{
+    width:80px;
+    height:80px;
+    border:2px solid black;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+}
+
+.logo img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+}
+
+.title{
+    text-align:center;
+    flex:1;
+}
+
+.title h1{
+    color:red;
+    margin:0;
+}
+
+.photo-box{
+    width:120px;
+    height:140px;
+    border:2px dashed #999;
+    border-radius:8px;
+    overflow:hidden;
+}
+
+.upload-area{
+    width:100%;
+    height:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    cursor:pointer;
+    color:#555;
+    font-size:13px;
+}
+
+.upload-area:hover{
+    background:#f5f5f5;
+}
+
+#fileName{
+    display:block;
+    text-align:center;
+    font-size:12px;
+    color:#555;
+}
+
+.courses{
+    background:green;
+    color:white;
+    padding:10px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.row{
+    display:flex;
+    gap:10px;
+    margin:5px 0;
+}
+
+.row input, .row select{
+    flex:1;
+    border:none;
+    border-bottom:1px dotted black;
+}
+
+.section{
+    background:orange;
+    text-align:center;
+}
+
+.red{
+    background:red;
+    color:white;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th, td{
+    border:1px solid black;
+}
+
+td input{
+    width:100%;
+    border:none;
+}
+
+.docs{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+}
+
+button{
+    width:100%;
+    padding:10px;
+    background:#2c3e50;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+@media(max-width:600px){
+    .row{
+        flex-direction:column;
+    }
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="form">
+
+<!-- HEADER -->
+<div class="header">
+
+    <div class="logo">
+        <img src="./logo.jpeg" alt="logo">
+    </div>
+
+    <div class="title">
+        <h1>ASTHA AGRICULTURE ACADEMY</h1>
+        <p>पता : सिविल अस्पताल के पीछे...</p>
+    </div>
+
+    <div class="photo-box">
+        <label class="upload-area" for="photo">
+            Upload Photo
+        </label>
+        <input type="file" id="photo" hidden>
+        <span id="fileName"></span>
+    </div>
+
+</div>
+
+<h2>REGISTRATION FORM</h2>
+
+<!-- COURSES -->
+<div class="courses">
+<label><input type="checkbox" value="BSC"> B.SC</label>
+<label><input type="checkbox" value="MSC"> M.SC</label>
+<label><input type="checkbox" value="BED"> B.Ed</label>
+<label><input type="checkbox" value="DED"> D.Ed</label>
+<label><input type="checkbox" value="DPHARMA"> D.PHARMA</label>
+<label><input type="checkbox" value="BTECH"> B.TECH</label>
+<label><input type="checkbox" value="NURSING"> Nursing</label>
+</div>
+
+<form id="form">
+
+<div class="row">
+<label>Name:</label>
+<input type="text" id="name" required>
+</div>
+
+<div class="row">
+<label>Father:</label>
+<input type="text" id="father">
+</div>
+
+<div class="row">
+<label>Address:</label>
+<input type="text" id="address">
+</div>
+
+<div class="row">
+<label>DOB:</label>
+<input type="date" id="dob">
+
+<label>Category:</label>
+<select id="category">
+<option>GEN</option>
+<option>OBC</option>
+<option>SC</option>
+<option>ST</option>
+</select>
+</div>
+
+<div class="row">
+<label>Mobile:</label>
+<input type="text" id="mobile">
+
+<label>WhatsApp:</label>
+<input type="text" id="whatsapp">
+</div>
+
+<div class="row">
+<label>Email:</label>
+<input type="text" id="email">
+</div>
+
+<div class="row">
+<label>Father's Occupation:</label>
+<input type="text" id="occupation">
+</div>
+
+<div class="row">
+<label>Fees:</label>
+<input type="number" id="fees">
+</div>
+
+<h3 class="section">EDUCATION</h3>
+
+<table>
+<tr>
+<th>Exam</th><th>Board</th><th>Year</th><th>Marks</th>
+</tr>
+
+<tr>
+<td>10th</td>
+<td><input id="tenthBoard"></td>
+<td><input id="tenthYear"></td>
+<td><input id="tenthMarks"></td>
+</tr>
+
+<tr>
+<td>12th</td>
+<td><input id="twelfthBoard"></td>
+<td><input id="twelfthYear"></td>
+<td><input id="twelfthMarks"></td>
+</tr>
+</table>
+
+<h3 class="section red">DOCUMENTS</h3>
+
+<div class="docs">
+<label><input type="checkbox" id="aadhaar"> Aadhaar</label>
+<label><input type="checkbox" id="photoDoc"> Photo</label>
+<label><input type="checkbox" id="marksheet"> Marksheet</label>
+<label><input type="checkbox" id="tc"> TC</label>
+</div>
+
+<button type="submit">Submit</button>
+
+</form>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>

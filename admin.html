@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Panel</title>
+
+<style>
+
+body{
+    font-family: Arial;
+    background:#f4f6f9;
+    margin:0;
+}
+
+/* HEADER */
+.header{
+    background:#2c3e50;
+    color:white;
+    padding:15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.header h2{
+    margin:0;
+}
+
+/* BUTTONS */
+.actions{
+    padding:10px;
+    text-align:center;
+}
+
+button{
+    padding:8px 15px;
+    margin:5px;
+    border:none;
+    cursor:pointer;
+    border-radius:5px;
+}
+
+.download{
+    background:#27ae60;
+    color:white;
+}
+
+.logout{
+    background:#e74c3c;
+    color:white;
+}
+
+/* TABLE */
+.table-container{
+    padding:10px;
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+}
+
+th{
+    background:#34495e;
+    color:white;
+    padding:10px;
+}
+
+td{
+    padding:8px;
+    text-align:center;
+}
+
+tr:nth-child(even){
+    background:#f2f2f2;
+}
+
+img{
+    border-radius:5px;
+}
+
+/* MOBILE */
+@media(max-width:600px){
+    th, td{
+        font-size:12px;
+        padding:5px;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <h2>📊 Student Data</h2>
+</div>
+
+<!-- ACTION BUTTONS -->
+<div class="actions">
+    <button class="download" onclick="download()">Download Excel</button>
+    <button class="logout" onclick="logout()">Logout</button>
+</div>
+
+<!-- TABLE -->
+<div class="table-container">
+    <table id="table"></table>
+</div>
+
+<script>
+
+if(!localStorage.getItem("token")){
+    alert("Please login first");
+    location.href="login.html";
+}
+
+async function loadData(){
+
+    let res = await fetch("http://localhost:5000/students",{
+        headers:{
+            Authorization: localStorage.getItem("token")
+        }
+    });
+
+    let data = await res.json();
+
+    let table = `
+    <tr>
+        <th>Name</th>
+        <th>Father</th>
+        <th>Mobile</th>
+        <th>Address</th>
+        <th>Course</th>
+        <th>Fees</th>
+        <th>Photo</th>
+    </tr>`;
+
+    data.forEach(s=>{
+        table += `
+        <tr>
+        <td>${s.name}</td>
+        <td>${s.father}</td>
+        <td>${s.mobile}</td>
+        <td>${s.address}</td>
+        <td>${s.course ? s.course.join(", ") : ""}</td>
+        <td>${s.fees || ""}</td>
+        <td>
+            <img src="http://localhost:5000/uploads/${s.photo}" width="60">
+        </td>
+        </tr>`;
+    });
+
+    document.getElementById("table").innerHTML = table;
+}
+
+function download(){
+    window.open("http://localhost:5000/export");
+}
+
+function logout(){
+    localStorage.removeItem("token");
+    location.href="login.html";
+}
+
+loadData();
+
+</script>
+
+</body>
+</html>

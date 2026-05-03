@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Login</title>
+
+<style>
+
+body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-family: Arial;
+    background: linear-gradient(135deg, #2c3e50, #4ca1af);
+}
+
+/* LOGIN BOX */
+.login-box{
+    background:white;
+    padding:30px;
+    border-radius:10px;
+    width:300px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.2);
+    text-align:center;
+}
+
+.login-box h2{
+    margin-bottom:20px;
+    color:#2c3e50;
+}
+
+/* INPUTS */
+input{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+    border-radius:5px;
+    border:1px solid #ccc;
+    outline:none;
+}
+
+input:focus{
+    border-color:#4ca1af;
+}
+
+/* BUTTON */
+button{
+    width:100%;
+    padding:10px;
+    background:#2c3e50;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    margin-top:10px;
+}
+
+button:hover{
+    background:#34495e;
+}
+
+/* ERROR TEXT */
+.error{
+    color:red;
+    font-size:13px;
+}
+
+/* MOBILE */
+@media(max-width:400px){
+    .login-box{
+        width:90%;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="login-box">
+
+<h2>🔐 Admin Login</h2>
+
+<input id="user" placeholder="Username">
+<input id="pass" type="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+
+<p class="error" id="error"></p>
+
+</div>
+
+<script>
+
+async function login(){
+
+    let username = document.getElementById("user").value;
+    let password = document.getElementById("pass").value;
+
+    if(!username || !password){
+        document.getElementById("error").innerText = "Enter username & password";
+        return;
+    }
+
+    try{
+        let res = await fetch("http://localhost:5000/login",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({username, password})
+        });
+
+        let data = await res.json();
+
+        if(res.status === 200){
+            localStorage.setItem("token", data.token);
+            location.href="admin.html";
+        }else{
+            document.getElementById("error").innerText = "Wrong username or password";
+        }
+
+    }catch(err){
+        document.getElementById("error").innerText = "Server error!";
+    }
+}
+</script>
+
+</body>
+</html>
