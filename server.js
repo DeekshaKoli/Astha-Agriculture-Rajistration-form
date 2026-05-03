@@ -2,29 +2,25 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const multer = require("multer");
-const path = require("path");
 const jwt = require("jsonwebtoken");
 const ExcelJS = require("exceljs");
+const cloudinary = require("./cloudinary");
+const streamifier = require("streamifier");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use("/uploads", express.static("uploads"));
 
 /* ---------------- DATABASE ---------------- */
 mongoose.connect(
 "mongodb://Deeksha:Deeksha123@ac-8knbqn9-shard-00-00.hsywxd3.mongodb.net:27017,ac-8knbqn9-shard-00-01.hsywxd3.mongodb.net:27017,ac-8knbqn9-shard-00-02.hsywxd3.mongodb.net:27017/studentDB?ssl=true&replicaSet=atlas-52fikm-shard-0&authSource=admin&appName=Cluster0"
 ).then(() => console.log("DB Connected"));
 
-/* ---------------- FILE UPLOAD ---------------- */
-const storage = multer.diskStorage({
-    destination: "uploads/",
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));
-    }
+/* ---------------- MULTER (Vercel SAFE) ---------------- */
+const upload = multer({
+  storage: multer.memoryStorage()
 });
-const upload = multer({ storage });
 
 /* ---------------- SCHEMA ---------------- */
 const studentSchema = new mongoose.Schema({
@@ -39,7 +35,19 @@ const studentSchema = new mongoose.Schema({
     occupation: String,
     fees: String,
     course: [String],
-    photo: String
+    photo: String,
+
+    tenthBoard: String,
+    tenthYear: String,
+    tenthMarks: String,
+    twelfthBoard: String,
+    twelfthYear: String,
+    twelfthMarks: String,
+
+    aadhaar: Boolean,
+    photoDoc: Boolean,
+    marksheet: Boolean,
+    tc: Boolean
 });
 
 const Student = mongoose.model("Student", studentSchema);
@@ -56,79 +64,93 @@ app.post("/login", (req, res) => {
     }
 });
 
-/* ---------------- REGISTER ---------------- */
+/* ---------------- REGISTER (FIXED) ---------------- */
 app.post("/register", upload.single("photo"), async (req, res) => {
 
     try {
 
-        console.log("BODY:", req.body);
-        console.log("FILE:", req.file);
+        let imageUrl = "";
 
-        // safe course parsing
-        let courses = [];
-        try {
-            if (req.body.course) {
-                courses = JSON.parse(req.body.course);
-            }
-        } catch (e) {
-            console.log("Course parse error:", e.message);
-            courses = [];
+        // Upload image to Cloudinary
+        if (req.file) {
+
+            const uploadStream = cloudinary.uploader.upload_stream(
+                { folder: "students" },
+                async (error, result) => {
+                    if (error) {
+                        return res.status(500).json({ error: error.message });
+                    }
+
+                    imageUrl = result.secure_url;
+
+                    await saveStudent();
+                }
+            );
+
+            streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+
+        } else {
+            await saveStudent();
         }
 
-        const student = new Student({
-            name: req.body.name || "",
-            father: req.body.father || "",
-            address: req.body.address || "",
-            dob: req.body.dob || "",
-            category: req.body.category || "",
-            mobile: req.body.mobile || "",
-            whatsapp: req.body.whatsapp || "",
-            email: req.body.email || "",
-            occupation: req.body.occupation || "",
-            fees: req.body.fees || "",
-            course: courses,
+        async function saveStudent() {
 
-            tenthBoard: req.body.tenthBoard || "",
-            tenthYear: req.body.tenthYear || "",
-            tenthMarks: req.body.tenthMarks || "",
+            let courses = [];
 
-            twelfthBoard: req.body.twelfthBoard || "",
-            twelfthYear: req.body.twelfthYear || "",
-            twelfthMarks: req.body.twelfthMarks || "",
+            try {
+                if (req.body.course) {
+                    courses = JSON.parse(req.body.course);
+                }
+            } catch (e) {
+                courses = [];
+            }
 
-            aadhaar: req.body.aadhaar === "true",
-            photoDoc: req.body.photoDoc === "true",
-            marksheet: req.body.marksheet === "true",
-            tc: req.body.tc === "true",
+            const student = new Student({
+                name: req.body.name || "",
+                father: req.body.father || "",
+                address: req.body.address || "",
+                dob: req.body.dob || "",
+                category: req.body.category || "",
+                mobile: req.body.mobile || "",
+                whatsapp: req.body.whatsapp || "",
+                email: req.body.email || "",
+                occupation: req.body.occupation || "",
+                fees: req.body.fees || "",
+                course: courses,
 
-            photo: req.file ? req.file.filename : ""
-        });
+                tenthBoard: req.body.tenthBoard || "",
+                tenthYear: req.body.tenthYear || "",
+                tenthMarks: req.body.tenthMarks || "",
 
-        await student.save();
+                twelfthBoard: req.body.twelfthBoard || "",
+                twelfthYear: req.body.twelfthYear || "",
+                twelfthMarks: req.body.twelfthMarks || "",
 
-        console.log("Student saved successfully");
+                aadhaar: req.body.aadhaar === "true",
+                photoDoc: req.body.photoDoc === "true",
+                marksheet: req.body.marksheet === "true",
+                tc: req.body.tc === "true",
 
-        return res.json({
-            message: "Saved Successfully"
-        });
+                photo: imageUrl
+            });
+
+            await student.save();
+
+            res.json({ message: "Saved Successfully" });
+        }
 
     } catch (err) {
-        console.log("🔥 REGISTER ERROR:", err);
-
-        return res.status(500).json({
-            message: "Server Error",
-            error: err.message
-        });
+        console.log("ERROR:", err);
+        res.status(500).json({ error: err.message });
     }
 });
-/* ---------------- STUDENTS (ADMIN) ---------------- */
+
+/* ---------------- STUDENTS ---------------- */
 app.get("/students", async (req, res) => {
 
     const token = req.headers.authorization;
 
-    if (!token) {
-        return res.status(403).send("Unauthorized");
-    }
+    if (!token) return res.status(403).send("Unauthorized");
 
     try {
         jwt.verify(token, "secretkey");
@@ -177,5 +199,5 @@ app.get("/export", async (req, res) => {
     res.end();
 });
 
-/* ---------------- SERVER ---------------- */
-app.listen(5000, () => console.log("Server running on 5000"));
+/* ---------------- EXPORT FOR VERCEL ---------------- */
+module.exports = app;
